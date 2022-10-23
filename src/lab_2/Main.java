@@ -41,8 +41,6 @@ public class Main {
 		
 		while (!isNumeric(e) || Integer.parseInt(e) != 1 && Integer.parseInt(e) != 2);
 		
-		//System.out.println(e);
-		
 		if (c == 1) {
 			
 			System.out.println("Enter height:");
@@ -306,6 +304,77 @@ public class Main {
 					}
 			}
 		}
+		
+		/*
+		
+		Float[] l2 = {(float)1,(float)2,(float)3,(float)4,(float)5,(float)6,(float)7,(float)8,(float)9};
+		
+		List<Float> l3 = Arrays.asList(l2);
+		
+		Matrix m = new Matrix(3, 3, l3);
+		
+		m.setEl(1,1, 25);
+		
+		imMatrix m2 = new imMatrix(3, 3, l3);
+		
+		System.out.println(String.valueOf(m.hashCode()));
+		
+		System.out.println(String.valueOf(m2.hashCode()));
+		
+		/*
+		
+		/*
+		
+		Matrix m2 = new Matrix(m);
+		
+		
+		
+		System.out.println();
+		
+		m2.setEl(0, 0, -100);
+		
+		System.out.println();
+		
+		m2.get();
+		
+		System.out.println();
+		
+		m.get();
+		
+		System.out.println();
+		
+		m2.getCol(2);
+		
+		*/
+		
+		//
+		
+		//System.out.println(String.valueOf(m2.get(0,2)));
+		
+		/*
+		
+		imMatrix mm = new imMatrix(2, 3, l3);
+		
+		
+		
+		mm.get();
+		
+		System.out.println(m.equals(mm) ? "true" : "false");
+		
+		System.out.println(String.valueOf(m.hashCode()));
+		
+		System.out.println(String.valueOf(mm.hashCode()));
+		
+		Float[] l4 = {(float)1,(float)2,(float)3,(float)4};
+		
+		List<Float> l5 = Arrays.asList(l2);
+		
+		Matrix m2 = new Matrix(2, 2, l5);
+		
+		Matrix im = inverse(m2, det(m2));
+		
+		im.get();*/
+		
 	}
 	
 	public static Matrix rowVec(int w) {
@@ -332,7 +401,7 @@ public class Main {
 		
 		float[][] m21 = new float[m.height()][m.width()];
 		
-		m21 = m.getCopy();
+		//m21 = m.getCopy();
 		
 		for (int y = 0; y < m.height(); y++) {
 			for (int x = 0; x < m.height(); x++) {
@@ -342,7 +411,7 @@ public class Main {
 			}
 		}
 		
-		m2.set(m2.height(), m2.width(), m21);
+		m2.set(m2.height(), m2.width(), m);
 		
 		return m2;
 		
@@ -497,7 +566,25 @@ public class Main {
 	}
 }
 
-class Matrix {
+interface Mat {
+	
+	int w = 0;
+	int h = 0;
+	float M[][] = new float[0][0];
+	
+	public int width();
+	public int height();
+	public float get(int y, int x);
+	public void getRow(int y);
+	public void getCol(int x);
+	public float[][] getCopy();
+	public void get();
+	public Boolean equals(Mat m2);
+	public int hashCode();
+	
+}
+
+class Matrix implements Mat {
 	
 	private int w, h;
 	
@@ -579,7 +666,7 @@ class Matrix {
 		h = m.height();
 		w = m.width();
 		
-		this.set(h, w, m.getCopy());
+		this.set(h, w, m);
 		
 	}
 	
@@ -600,7 +687,13 @@ class Matrix {
 		
 	}
 	
-	public void set(int h, int w, float M[][]) {
+	public void setEl(int y, int x, float f) {
+	
+		M[y][x] = f;
+		
+	}
+	
+	public void set(int h, int w, Mat m) {
 		
 		if (w < 0) throw new ArithmeticException("width cannot be negative");
 		if (h < 0) throw new ArithmeticException("height cannot be negative");
@@ -608,12 +701,18 @@ class Matrix {
 		this.h = h;
 		
 		this.w = w;
-	
+		
+		if (M == null) M = new float[h][w];
+		
+		//System.out.println(String.valueOf(w));
+
+		//System.out.println(String.valueOf(h));
+		
 		for (int y = 0; y < h; y++) {
 			
 			for (int x = 0; x < w; x++) {
 				
-				this.M[y][x] = M[y][x];
+				this.setEl(y, x, m.get(y, x));
 			
 			}
 		}
@@ -634,7 +733,7 @@ class Matrix {
 		}
 	}
 	
-	public Boolean equals(Matrix m2) {
+	public Boolean equals(Mat m2) {
 	
 		if (this.w != m2.width()) return false;
 		if (this.h != m2.height()) return false;
@@ -651,7 +750,7 @@ class Matrix {
 		
 	}
 	
-	public int hashCode(Matrix m2) {
+	public int hashCode() {
 		
 		int p = 31;
 		
@@ -660,7 +759,7 @@ class Matrix {
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
 				
-				r = p * r + ((Object) m2.get(y, x)).hashCode();
+				r = p * r + ((Object) get(y, x)).hashCode();
 				
 			}
 		}
@@ -670,7 +769,7 @@ class Matrix {
 	}
 }
 
-final class imMatrix {
+final class imMatrix implements Mat {
 	
 	private int w, h;
 	
@@ -809,7 +908,7 @@ final class imMatrix {
 		}
 	}
 	
-	public Boolean equals(imMatrix m2) {
+	public Boolean equals(Mat m2) {
 	
 		if (this.w != m2.width()) return false;
 		if (this.h != m2.height()) return false;
@@ -826,7 +925,7 @@ final class imMatrix {
 		
 	}
 	
-	public int hashCode(imMatrix m2) {
+	public int hashCode() {
 		
 		int p = 31;
 		
@@ -835,7 +934,7 @@ final class imMatrix {
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
 				
-				r = p * r + ((Object) m2.get(y, x)).hashCode();
+				r = p * r + ((Object) get(y, x)).hashCode();
 				
 			}
 		}
